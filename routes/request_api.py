@@ -61,12 +61,10 @@ def generate():
                     '华启智能科技副总经理，分管技术中心', '7', '智慧城市/空间组'),
                    ('13', '建筑/工程/交通运输', 'AI为工程咨询带来怎样的便捷和行业的改变',
                     '2022级1班17A，一家工程咨询公司的经营人', '6', '建筑/工程/交通运输组')]
-        exist_groups = {}
-        for tmp in results:
 
+        # 提取组号并创建字典
+        group_set = {item[4]: item for item in results}
 
-            if i[0] == requestid:
-                output.append(i)
 
 
         llm_res = [{'user_id': 28, 'group_id': 3, 'group_name': '硬件/半导体组'}, {'user_id': 29, 'group_id': 4, 'group_name': '制造业组'}]
