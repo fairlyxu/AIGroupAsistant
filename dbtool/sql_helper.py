@@ -33,7 +33,7 @@ class SqlHelper:
                 insert_query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES {values_str};"
                 db.cursor.execute(insert_query)
                 db.conn.commit()
-                print("create_groups！！！！")
+                print("create_groups success！！！！")
             except Exception as e:
                 db.conn.rollback()
                 traceback.print_exc()
@@ -59,6 +59,23 @@ class SqlHelper:
             except Exception as e:
                 traceback.print_exc()
                 print("get_task_by_status error~:", e)
+    def update_users_group_info(self,user_datas):
+        with self as db:
+            try:
+                # 表名
+                table_name = 'yuanyu_activity_user'
+                # 构建更新语句
+                update_queries = []
+                for item in user_datas:
+                    query = f"UPDATE {table_name} SET group_id = {item['group_id']}, group_name = '{item['group_name']}' WHERE user_id = {item['user_id']};"
+                    update_queries.append(query)
+
+
+                db.cursor.execute(update_queries)
+                print("update_users_group_info success！！！！")
+            except Exception as e:
+                traceback.print_exc()
+                print("update_users_group_info success！！！！",e)
 
     def __enter__(self):
         self.conn = self.pool.connection()
