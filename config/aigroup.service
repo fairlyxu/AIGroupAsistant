@@ -1,12 +1,12 @@
 [Unit]
-Description=AI  Task Server
+Description=AI  Group Server
 After=network.target syslog.target
 
 [Service]
-EnvironmentFile=/etc/systemd/system/mmqload.conf
+EnvironmentFile=/etc/systemd/system/aigroupload.conf
 User=root
 # 运行jar包的指令
-ExecStart=/usr/bin/python3 /data/Taichi/app_mmq.py
+ExecStart=/usr/bin/python3 /data/AIGroupAsistant/app.py
 # 收到正常停止命令时不自动重启(systemctl stop 时不会自动重启)
 SuccessExitStatus=143
 # 在服务失败时自动重启
