@@ -63,7 +63,7 @@ def get_prompt(groups=[],regroup=[],group_num=7):
 #zhizengzeng
 def llm_chat_zhizengzeng(groups=[],regroup=[],group_num=7):
     result = []
-    prompt = get_prompt(groups,regroup)
+    prompt = get_prompt(groups,regroup,group_num)
     url="https://api.zhizengzeng.com/v1/chat/completions"
     api_secret_key = 'd60ca8832a0297ff3861136b649f3aa8';  # 你的api_secret_key
     headers = {'Content-Type': 'application/json', 'Accept':'application/json',
@@ -84,11 +84,11 @@ def llm_chat_zhizengzeng(groups=[],regroup=[],group_num=7):
     return result
 
 
-def llm_chat_tran(groups=[],regroup=[]):
+def llm_chat_tran(groups=[],regroup=[],group_num=7):
 
     t1 = time.time()
     result = [{'user_id': 28, 'group_id': 3, 'group_name': '硬件/半导体组'}, {'user_id': 29, 'group_id': 4, 'group_name': '制造业组'}]
-    prompt = get_prompt(groups,regroup)
+    prompt = get_prompt(groups,regroup,group_num)
 
     text = """根据每个学生提交的自我介绍和需要了解的问题进行相同领域和兴趣分组,现在对新加入的同学进行重新分组："""
     url = "http://test-content-api.shalltry.com/llm/chat"

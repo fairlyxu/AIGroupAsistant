@@ -1,9 +1,8 @@
 import traceback
-import json
 from flask import jsonify, abort, request, Blueprint
-from dbtool.sql_helper import sqlhelper
-from utils import *
-import requests
+#from dbtool.sql_helper import sqlhelper
+from utils.llm_helper import llm_chat_tran
+
 REQUEST_API = Blueprint('request_api', __name__)
 def get_blueprint():
     """Return the blueprint for the main app module"""
@@ -15,33 +14,29 @@ def generate():
     output = []
     code = 100
     msg = "排队中"
-
     if not request.get_json():
         abort(400)
     data = request.get_json(force=True)
-    if not data.get('requestid'):
-        print("requestid is not exist")
+    print("data:",data)
+    requestid = data.get('requestid')
+    num = data.get('num')
+    activity_id = data.get('activaty_id')
+    regroup_users_ids = data.get('users')
+    if not requestid or not num or not activity_id or not regroup_users_ids:
         abort(400)
-    if not data.get('num'):
-        print("num is not exist")
-        abort(400)
-    if not data.get('activaty_id'):
-        print("activaty_id    is not exist")
-        abort(400)
-    if not data.get('users'):
-        print("users    is not exist")
-        abort(400)
-
     try:
-        requestid = "8eaaaaadddssssdddd"
-        num = 7
-        activity_id=1
-        users = [1, 2, 3, 4]
-        #obj = sqlhelper.get_task_by_requestid(data.get('requestid'))
+        all_users = []#sqlhelper.get_task_by_requestid(activity_id)
+        remain_users = []
+        regroup_users = []
 
-        # 获取user id 的提交信息
-        # obj = sqlhelper.get_users_by_ids(data.get('requestid'))
-        results = [('1', '云服务', '亲子、AI、哲学',
+        for user in all_users:
+            if user[0] not in regroup_users:
+                remain_users.append(user)
+            else:
+                regroup_users.append((user[0], user[1], user[2], user[3]))
+
+
+        remain_users = [('1', '云服务', '亲子、AI、哲学',
                     '人工智能/培训/企业服务公司】丽台科技-英伟达GPU总代，冰特科技-自建算力平台，冰特算力学院-AI培训，英伟达深度学习中心-高中研学，元起点-灵活用工和知识产权',
                     '1', '云服务组'),
                    ('3', '硬件 / 半导体', 'AI在IT服务中的应用', '网络安全行业技术人员', '3', '硬件/半导体组'),
@@ -61,20 +56,29 @@ def generate():
                     '华启智能科技副总经理，分管技术中心', '7', '智慧城市/空间组'),
                    ('13', '建筑/工程/交通运输', 'AI为工程咨询带来怎样的便捷和行业的改变',
                     '2022级1班17A，一家工程咨询公司的经营人', '6', '建筑/工程/交通运输组')]
+        regroup_users = [('用户28', '硬件/半导体', '了解AI在应用的趋势', '10年创业老板  虔诚学习'),
+               ('用户29', '制造业', '元宇宙在制造业的应用', '工学博士，长期从事测试技术与仪器开发')]
 
-        # 提取组号并创建字典
-        group_set = {item[4]: item for item in results}
+        # 调用llm模型，生成分组信息
+        llm_res = llm_chat_tran(remain_users, regroup_users, num)
+        print("llm_res:", llm_res)
 
-
-
-        llm_res = [{'user_id': 28, 'group_id': 3, 'group_name': '硬件/半导体组'}, {'user_id': 29, 'group_id': 4, 'group_name': '制造业组'}]
-
-        sqlhelper.update_users_group_info(llm_res)
-
+        #llm_res = [{'user_id': 28, 'group_id': 3, 'group_name': '硬件/半导体组'},  {'user_id': 29, 'group_id': 4, 'group_name': '制造业组'}]
 
 
 
-
+        # 更新分组信息，插入数据库
+        unique_groups = []
+        seen_group_ids = set({t[4] for t in all_users})
+        for record in llm_res:
+            user_id = record['user_id']
+            group_id = record['group_id']
+            group_name = record['group_name']
+            output.append({'id':user_id,'group':group_id})
+            if group_id not in seen_group_ids:
+                unique_groups.append({'activity_id':activity_id,'group_id': group_id, 'group_name': group_name})
+                seen_group_ids.add(group_id)
+        #sqlhelper.create_groups(unique_groups)
 
     except Exception as e:
         print("error:", e)

@@ -1,13 +1,21 @@
-# 假设 results 是 fetchall() 返回的结果
-results = [
-    (1, 'Alice', 30),
-    (2, 'Bob', 25)
-]
+import requests
 
-# 将结果转换为字符串
-result_strings = [' | '.join(map(str, row)) for row in results]
+url = "http://127.0.0.1:5001/generate"
 
-# 将所有行拼接成一个字符串，使用换行符分隔
-final_string = '\n'.join(result_strings)
+payload = {
+    "requestid": "8eaaaaadddssssdddd",
+    "num": 7,
+    "activaty_id": 1,
+    "users": [1, 2, 3, 4]
+}
+headers = {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate, br",
+    "User-Agent": "PostmanRuntime-ApipostRuntime/1.1.0",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json"
+}
 
-print(final_string)
+response = requests.request("POST", url, json=payload, headers=headers)
+
+print(response.text)
