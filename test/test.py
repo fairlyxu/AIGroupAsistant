@@ -1,6 +1,6 @@
 import requests
 
-url = "http://127.0.0.1:5001/generate"
+url = "http://47.116.76.13:5003/generate"
 
 payload = {
     "requestid": "8eaaaaadddssssdddd",
